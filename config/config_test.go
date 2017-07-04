@@ -72,7 +72,7 @@ func TestTargetMap_ExtendDefaultTarget(t *testing.T) {
 		want TargetMap
 	}{
 		{
-			msg: "non `default` exsiting values should not overwrite with `default` values",
+			msg: "non `default` existing values should not overwrite with `default` values",
 			src: TargetMap{
 				"default": Target{Rule: RuleMap{"a": {"op": "default"}}},
 				"go":      Target{Rule: RuleMap{"a": {"op": "go"}}},
