@@ -1,0 +1,33 @@
+targets:
+  default:
+    rules:
+      linebreak:
+        enforce: true
+        style: lf
+      final-newline:
+        enforce: true
+        num: 1
+      first-newline:
+        enforce: true
+        num: 0
+      no-bom:
+        enforce: true
+      no-eol-space:
+        enforce: true
+      indent:
+        enforce: true
+        style: soft
+        size: 2
+  go:
+    patterns:
+      - '**/*.go'
+    rules:
+      indent:
+        enforce: true
+        style: hard
+  markdown:
+    patterns:
+      - '**/*.md'
+    rules:
+      no-eol-space:
+        enforce: false
