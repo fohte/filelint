@@ -65,6 +65,7 @@ type Result struct {
 
 func NewResult() *Result {
 	var reps []*Report
+	reps = []*Report{}
 	return &Result{
 		Reports: reps,
 	}

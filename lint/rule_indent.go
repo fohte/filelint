@@ -77,13 +77,13 @@ func (r *IndentRule) Lint(src []byte) (*Result, error) {
 	res := NewResult()
 
 	var indent []byte
-	var errmsg string
+	var expectMsg string
 	switch r.Style {
 	case IndentStyleSoft:
-		errmsg = fmt.Sprintf(`Expected indent with %d space(s) but used hardtabs (\t)`, r.Size)
+		expectMsg = fmt.Sprintf(`Expected indent with %d space(s)`, r.Size)
 		indent = bytes.Repeat([]byte{byte(r.Style)}, r.Size)
 	case IndentStyleHard:
-		errmsg = `Expected indent with hardtabs (\t) but used softtabs`
+		expectMsg = `Expected indent with hardtabs (\t)`
 		indent = []byte{byte(r.Style)}
 	}
 
@@ -105,6 +105,12 @@ func (r *IndentRule) Lint(src []byte) (*Result, error) {
 		newLine = append(newLine, line...)
 
 		if len(newLine) != len(lines[i]) {
+			var errmsg string
+			if bytes.HasPrefix(lines[i], []byte("\t")) {
+				errmsg = fmt.Sprintf(`%s but used hardtabs (\t)`, expectMsg)
+			} else if bytes.HasPrefix(lines[i], []byte(" ")) {
+				errmsg = fmt.Sprintf(`%s but used %d space(s)`, expectMsg, softIndentWidth)
+			}
 			res.AddReport(i+1, -1, errmsg)
 		}
 

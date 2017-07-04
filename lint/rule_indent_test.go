@@ -11,47 +11,99 @@ func TestIndentRule_Lint(t *testing.T) {
 		rule IndentRule
 		src  []byte
 		want []byte
+		rep  []*Report
 	}{
 		// replace to softtab indents
 		{
 			rule: IndentRule{Style: IndentStyleSoft, Size: 2},
 			src:  []byte("\t"),
 			want: []byte("  "),
+			rep: []*Report{
+				{
+					position: &Position{1, -1},
+					message:  `Expected indent with 2 space(s) but used hardtabs (\t)`,
+				},
+			},
 		},
 		{
 			rule: IndentRule{Style: IndentStyleSoft, Size: 4},
 			src:  []byte("\t"),
 			want: []byte("    "),
+			rep: []*Report{
+				{
+					position: &Position{1, -1},
+					message:  `Expected indent with 4 space(s) but used hardtabs (\t)`,
+				},
+			},
 		},
 		{
 			rule: IndentRule{Style: IndentStyleSoft, Size: 2},
 			src:  []byte("\t\t"),
 			want: []byte("    "),
+			rep: []*Report{
+				{
+					position: &Position{1, -1},
+					message:  `Expected indent with 2 space(s) but used hardtabs (\t)`,
+				},
+			},
 		},
 		{
 			rule: IndentRule{Style: IndentStyleSoft, Size: 2},
 			src:  []byte("  "),
 			want: []byte("  "),
+			rep:  []*Report{},
 		},
 		{
 			rule: IndentRule{Style: IndentStyleSoft, Size: 2},
 			src:  []byte("\t\n\t"),
 			want: []byte("  \n  "),
+			rep: []*Report{
+				{
+					position: &Position{1, -1},
+					message:  `Expected indent with 2 space(s) but used hardtabs (\t)`,
+				},
+				{
+					position: &Position{2, -1},
+					message:  `Expected indent with 2 space(s) but used hardtabs (\t)`,
+				},
+			},
 		},
 		{
 			rule: IndentRule{Style: IndentStyleSoft, Size: 2},
 			src:  []byte("\t\r\n\t"),
 			want: []byte("  \r\n  "),
+			rep: []*Report{
+				{
+					position: &Position{1, -1},
+					message:  `Expected indent with 2 space(s) but used hardtabs (\t)`,
+				},
+				{
+					position: &Position{2, -1},
+					message:  `Expected indent with 2 space(s) but used hardtabs (\t)`,
+				},
+			},
 		},
 		{
 			rule: IndentRule{Style: IndentStyleSoft, Size: 2},
 			src:  []byte("\n\t\n  "),
 			want: []byte("\n  \n  "),
+			rep: []*Report{
+				{
+					position: &Position{2, -1},
+					message:  `Expected indent with 2 space(s) but used hardtabs (\t)`,
+				},
+			},
 		},
 		{
 			rule: IndentRule{Style: IndentStyleSoft, Size: 4},
 			src:  []byte(".\n  "),
 			want: []byte(".\n    "),
+			rep: []*Report{
+				{
+					position: &Position{2, -1},
+					message:  `Expected indent with 4 space(s) but used 2 space(s)`,
+				},
+			},
 		},
 
 		// replace to hardtab indents
@@ -59,32 +111,71 @@ func TestIndentRule_Lint(t *testing.T) {
 			rule: IndentRule{Style: IndentStyleHard},
 			src:  []byte(".\n  "),
 			want: []byte(".\n\t"),
+			rep: []*Report{
+				{
+					position: &Position{2, -1},
+					message:  `Expected indent with hardtabs (\t) but used 2 space(s)`,
+				},
+			},
 		},
 		{
 			rule: IndentRule{Style: IndentStyleHard, Size: 2},
 			src:  []byte(".\n  "),
 			want: []byte(".\n\t"),
+			rep: []*Report{
+				{
+					position: &Position{2, -1},
+					message:  `Expected indent with hardtabs (\t) but used 2 space(s)`,
+				},
+			},
 		},
 		{
 			rule: IndentRule{Style: IndentStyleHard},
 			src:  []byte(".\n  \n    "),
 			want: []byte(".\n\t\n\t\t"),
+			rep: []*Report{
+				{
+					position: &Position{2, -1},
+					message:  `Expected indent with hardtabs (\t) but used 2 space(s)`,
+				},
+				{
+					position: &Position{3, -1},
+					message:  `Expected indent with hardtabs (\t) but used 2 space(s)`,
+				},
+			},
 		},
 		{
 			rule: IndentRule{Style: IndentStyleHard},
 			src:  []byte(".\r\n  \r\n    "),
 			want: []byte(".\r\n\t\r\n\t\t"),
+			rep: []*Report{
+				{
+					position: &Position{2, -1},
+					message:  `Expected indent with hardtabs (\t) but used 2 space(s)`,
+				},
+				{
+					position: &Position{3, -1},
+					message:  `Expected indent with hardtabs (\t) but used 2 space(s)`,
+				},
+			},
 		},
 		{
 			rule: IndentRule{Style: IndentStyleHard},
 			src:  []byte(".\n\t\n  "),
 			want: []byte(".\n\t\n\t"),
+			rep: []*Report{
+				{
+					position: &Position{3, -1},
+					message:  `Expected indent with hardtabs (\t) but used 2 space(s)`,
+				},
+			},
 		},
 	}
 
 	for _, tt := range tests {
 		got, _ := tt.rule.Lint(tt.src)
 		assert.Equal(t, tt.want, got.Fixed)
+		assert.Equal(t, tt.rep, got.Reports)
 	}
 }
 
