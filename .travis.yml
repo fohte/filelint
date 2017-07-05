@@ -3,8 +3,12 @@ language: go
 go:
   - tip
 
+install:
+  - go install
+
 script:
   - go test -v ./...
+  - filelint
 
 before_deploy:
   - go get -u github.com/laher/goxc
