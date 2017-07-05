@@ -6,6 +6,11 @@ go:
 script:
   - go test -v ./...
 
+before_deploy:
+  - go get -u github.com/laher/goxc
+  - mkdir -p $TRAVIS_BUILD_DIR/dist
+  - goxc -d=$TRAVIS_BUILD_DIR/dist -tasks=clean-destination,xc,archive,rmbin -bc="windows linux darwin"
+
 deploy:
   provider: releases
   skip_cleanup: true
