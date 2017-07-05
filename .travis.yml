@@ -5,3 +5,15 @@ go:
 
 script:
   - go test -v ./...
+
+deploy:
+  provider: releases
+  skip_cleanup: true
+  api_key:
+    secure: qtIl6iuBhmOJTrAtUgKM+mfHCSeQi82EetSjosKecWGQ/3m8WsrXL3xMwc3aBPTPCtRcfgGBnWQQnrMpShG3Q71+s+zrUi3vn4YjdriyCzmmQf3s8SApYHj7xJe6ThiSMAyRnAxkb+0YydsUdOsQ5TIt1ieWtryyFEAPvMaplbU0ztQCQ9Jw0rHPzN7/QkO8Qh34q2QZwVVfgmbFpvzaWKFEyA7mna+FDnLRYwTgq7CmcXZIedy8gE/fDVJBT3Y4VUJxNYq5VZ/hruNQnUeJM/8c+g/02u6uu6i51e8OUwMlCK76y4BK7lv/E1rOEbJvBEg3z3mkrb2kDtr3LWFbrkm5Us2sYeK8hwkTwiz043x3B9XPtXCAPaSTyTTtPK3oFMFFvx7bOfNeB6kcMJIM9ixY7a2YAHtQjPm7ohDt1Bsi/EhvuIZC6fX4oIWcgUkBNrlYib6Yb48GAV264urzhYpW//En7UVkQwc1hPyxTTCiO16SFiDUQntbhK/XcuQVZ3ezsHDPMjxTUsiZCHQmE0ZrQyUzhUqyZ02iO+qpJuhNWKMqY64aeZ29E87PpFWnDV9MmDfPUPe+g9NRyoWNRZnlih9orD9NGtYiDylgWeDUGojby5MTXxdUPtz4zARlTOQBNKCfd12lTtGIb/6HQebUlk69w8701r6vPIipxlQ=
+  file_glob: true
+  file: "$TRAVIS_BUILD_DIR/dist/**/*.{tar.gz,zip}"
+  on:
+    repo: synchro-food/filelint
+    all_branches: true
+    tags: true
