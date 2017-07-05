@@ -9,9 +9,9 @@ import (
 	yaml "gopkg.in/yaml.v2"
 
 	"github.com/fatih/set"
-	"github.com/fohte/filelint/lib"
 	zglob "github.com/mattn/go-zglob"
 	"github.com/mohae/deepcopy"
+	"github.com/synchro-food/filelint/lib"
 )
 
 type Config struct {

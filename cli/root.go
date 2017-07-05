@@ -10,10 +10,10 @@ import (
 
 	yaml "gopkg.in/yaml.v2"
 
-	"github.com/fohte/filelint/config"
-	"github.com/fohte/filelint/dispatcher"
-	"github.com/fohte/filelint/lib"
-	"github.com/fohte/filelint/lint"
+	"github.com/synchro-food/filelint/config"
+	"github.com/synchro-food/filelint/dispatcher"
+	"github.com/synchro-food/filelint/lib"
+	"github.com/synchro-food/filelint/lint"
 
 	"github.com/spf13/cobra"
 )

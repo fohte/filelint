@@ -1,6 +1,6 @@
 package main
 
-import "github.com/fohte/filelint/cli"
+import "github.com/synchro-food/filelint/cli"
 
 //go:generate go-bindata -pkg config -o config/bindata.go config/default.yml
 

@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/fohte/filelint/config"
-	"github.com/fohte/filelint/lib"
-	"github.com/fohte/filelint/lint"
 	gitignore "github.com/sabhiram/go-gitignore"
+	"github.com/synchro-food/filelint/config"
+	"github.com/synchro-food/filelint/lib"
+	"github.com/synchro-food/filelint/lint"
 )
 
 type Dispatcher struct {
