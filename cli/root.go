@@ -54,7 +54,7 @@ func Execute() {
 
 		switch exitStatus {
 		case LintFailedExitStatus:
-			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			break
 		case DefaultExitStatus:
 			fmt.Fprintf(os.Stderr, "Error: %v\n\n", err)
 			rootCmd.Usage()
