@@ -220,6 +220,24 @@ func TestIndentRule_Lint(t *testing.T) {
 		{
 			rule: IndentRule{Style: IndentStyleSoft, Size: 2},
 			src: []byte(strings.Join([]string{
+				"/**",
+				" *",
+				" *",
+				" */",
+				"",
+			}, "\n")),
+			want: []byte(strings.Join([]string{
+				"/**",
+				" *",
+				" *",
+				" */",
+				"",
+			}, "\n")),
+			rep: []*Report{},
+		},
+		{
+			rule: IndentRule{Style: IndentStyleSoft, Size: 2},
+			src: []byte(strings.Join([]string{
 				".",
 				"  '/**'",
 				"  ' *'",

@@ -167,7 +167,7 @@ func searchJavadocComments(lines [][]byte) []*columnRange {
 				if bytes.HasPrefix(currentLine, []byte("*/")) {
 					inJavadoc = false
 					cr.end = i + 1
-				} else {
+				} else if !bytes.HasPrefix(beforeLine, []byte("*")) {
 					inJavadoc = false
 					cr = nil
 				}
