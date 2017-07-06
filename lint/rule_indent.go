@@ -99,8 +99,8 @@ func (r *IndentRule) Lint(src []byte) (*Result, error) {
 
 		var depth int
 		if hasJavadocSpace {
-			// [1:] means truncate first one space (` *`, ` */`) for not recognizing as an indent
-			depth = detectIndentDepth(line[1:], softIndentWidth)
+			idx := bytes.Index(line, []byte(" *"))
+			depth = detectIndentDepth(line[:idx], softIndentWidth)
 		} else {
 			depth = detectIndentDepth(line, softIndentWidth)
 		}

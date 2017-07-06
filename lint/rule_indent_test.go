@@ -238,6 +238,35 @@ func TestIndentRule_Lint(t *testing.T) {
 		{
 			rule: IndentRule{Style: IndentStyleSoft, Size: 2},
 			src: []byte(strings.Join([]string{
+				"\t/**",
+				"\t *",
+				"\t */",
+				"",
+			}, "\n")),
+			want: []byte(strings.Join([]string{
+				"  /**",
+				"   *",
+				"   */",
+				"",
+			}, "\n")),
+			rep: []*Report{
+				{
+					position: &Position{1, -1},
+					message:  `Expected indent with 2 space(s) but used hardtabs (\t)`,
+				},
+				{
+					position: &Position{2, -1},
+					message:  `Expected indent with 2 space(s) but used hardtabs (\t)`,
+				},
+				{
+					position: &Position{3, -1},
+					message:  `Expected indent with 2 space(s) but used hardtabs (\t)`,
+				},
+			},
+		},
+		{
+			rule: IndentRule{Style: IndentStyleSoft, Size: 2},
+			src: []byte(strings.Join([]string{
 				".",
 				"  '/**'",
 				"  ' *'",
