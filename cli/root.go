@@ -72,26 +72,9 @@ func execute(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	if configFile != "" && !lib.IsExist(configFile) {
-		return Raise(ErrNoSuchConfigFile)
-	}
-
-	var cfg *config.Config
-	if useDefaultConfig {
-		var err error
-		cfg, err = config.NewDefaultConfig()
-		if err != nil {
-			return Raise(err)
-		}
-	} else {
-		if configFile == "" {
-			configFile, _ = config.SearchConfigFile()
-		}
-		var err error
-		cfg, err = config.NewConfig(configFile)
-		if err != nil {
-			return Raise(err)
-		}
+	cfg, err := loadConfig(configFile, useDefaultConfig)
+	if err != nil {
+		return Raise(err)
 	}
 
 	if len(args) > 0 {
@@ -180,6 +163,35 @@ func execute(cmd *cobra.Command, args []string) error {
 	}
 
 	return nil
+}
+
+func loadConfig(configFile string, useDefault bool) (*config.Config, error) {
+	if useDefault {
+		cfg, err := config.NewDefaultConfig()
+		if err != nil {
+			return nil, err
+		}
+		return cfg, err
+	}
+
+	if configFile != "" && !lib.IsExist(configFile) {
+		return nil, ErrNoSuchConfigFile
+	}
+
+	if configFile == "" {
+		var exist bool
+		configFile, exist = config.SearchConfigFile()
+		if !exist {
+			return loadConfig("", true)
+		}
+	}
+
+	cfg, err := config.NewConfig(configFile)
+	if err != nil {
+		return nil, err
+	}
+	return cfg, nil
+
 }
 
 func writeFile(filename string, src []byte) error {
