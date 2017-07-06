@@ -151,11 +151,10 @@ func searchJavadocComments(lines [][]byte) []*columnRange {
 
 	for i := 1; i < len(lines); i++ {
 		bef := i - 1
-		beforeLine := lines[bef]
-		currentLine := lines[i]
+		beforeLine := bytes.TrimLeft(lines[bef], " \t")
+		currentLine := bytes.TrimLeft(lines[i], " \t")
 
-		if index := bytes.Index(beforeLine, []byte("/**")); index >= 0 &&
-			bytes.Index(currentLine[index:], []byte(" *")) >= 0 {
+		if bytes.HasPrefix(beforeLine, []byte("/**")) && bytes.HasPrefix(currentLine, []byte("*")) {
 			inJavadoc = true
 			cr = &columnRange{
 				begin: bef + 1,
@@ -164,15 +163,14 @@ func searchJavadocComments(lines [][]byte) []*columnRange {
 		}
 
 		if inJavadoc {
-			if index := bytes.Index(beforeLine, []byte(" *")); index >= 0 &&
-				bytes.Index(currentLine[index:], []byte(" *")) >= 0 {
-				if index >= 0 && bytes.Index(currentLine[index:], []byte(" */")) >= 0 {
+			if bytes.HasPrefix(beforeLine, []byte("*")) {
+				if bytes.HasPrefix(currentLine, []byte("*/")) {
 					inJavadoc = false
 					cr.end = i + 1
+				} else {
+					inJavadoc = false
+					cr = nil
 				}
-			} else {
-				inJavadoc = false
-				cr = nil
 			}
 		}
 

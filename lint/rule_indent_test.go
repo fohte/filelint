@@ -1,6 +1,7 @@
 package lint
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -215,6 +216,40 @@ func TestIndentRule_Lint(t *testing.T) {
 					message:  `Expected indent with 4 space(s) but used 2 space(s)`,
 				},
 			},
+		},
+		{
+			rule: IndentRule{Style: IndentStyleSoft, Size: 2},
+			src: []byte(strings.Join([]string{
+				".",
+				"  '/**'",
+				"  ' *'",
+				"  ' */'",
+			}, "\n")),
+			want: []byte(strings.Join([]string{
+				".",
+				"  '/**'",
+				"  ' *'",
+				"  ' */'",
+			}, "\n")),
+			rep: []*Report{},
+		},
+		{
+			rule: IndentRule{Style: IndentStyleSoft, Size: 2},
+			src: []byte(strings.Join([]string{
+				".",
+				"  '/**'",
+				"    ' *'",
+				"      ' *'",
+				"    ' */'",
+			}, "\n")),
+			want: []byte(strings.Join([]string{
+				".",
+				"  '/**'",
+				"    ' *'",
+				"      ' *'",
+				"    ' */'",
+			}, "\n")),
+			rep: []*Report{},
 		},
 	}
 
