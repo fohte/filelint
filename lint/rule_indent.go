@@ -99,8 +99,11 @@ func (r *IndentRule) Lint(src []byte) (*Result, error) {
 
 		var depth int
 		if hasJavadocSpace {
-			idx := bytes.Index(line, []byte(" *"))
-			depth = detectIndentDepth(line[:idx], softIndentWidth)
+			if idx := bytes.Index(line, []byte(" *")); idx >= 0 {
+				depth = detectIndentDepth(line[:idx], softIndentWidth)
+			} else {
+				depth = detectIndentDepth(line, softIndentWidth)
+			}
 		} else {
 			depth = detectIndentDepth(line, softIndentWidth)
 		}
@@ -167,10 +170,13 @@ func searchJavadocComments(lines [][]byte) []*columnRange {
 				if bytes.HasPrefix(currentLine, []byte("*/")) {
 					inJavadoc = false
 					cr.end = i + 1
-				} else if !bytes.HasPrefix(beforeLine, []byte("*")) {
-					inJavadoc = false
-					cr = nil
 				}
+			} else {
+				if len(beforeLine) == 0 {
+					continue
+				}
+				inJavadoc = false
+				cr = nil
 			}
 		}
 
