@@ -170,6 +170,52 @@ func TestIndentRule_Lint(t *testing.T) {
 				},
 			},
 		},
+
+		// for the javadoc comment style
+		{
+			rule: IndentRule{Style: IndentStyleSoft, Size: 2},
+			src:  []byte("/**\n *\n */"),
+			want: []byte("/**\n *\n */"),
+			rep:  []*Report{},
+		},
+		{
+			rule: IndentRule{Style: IndentStyleSoft, Size: 2},
+			src:  []byte(".\n\t/**\n\t *\n\t */"),
+			want: []byte(".\n  /**\n   *\n   */"),
+			rep: []*Report{
+				{
+					position: &Position{2, -1},
+					message:  `Expected indent with 2 space(s) but used hardtabs (\t)`,
+				},
+				{
+					position: &Position{3, -1},
+					message:  `Expected indent with 2 space(s) but used hardtabs (\t)`,
+				},
+				{
+					position: &Position{4, -1},
+					message:  `Expected indent with 2 space(s) but used hardtabs (\t)`,
+				},
+			},
+		},
+		{
+			rule: IndentRule{Style: IndentStyleSoft, Size: 4},
+			src:  []byte(".\n  /**\n   *\n   */"),
+			want: []byte(".\n    /**\n     *\n     */"),
+			rep: []*Report{
+				{
+					position: &Position{2, -1},
+					message:  `Expected indent with 4 space(s) but used 2 space(s)`,
+				},
+				{
+					position: &Position{3, -1},
+					message:  `Expected indent with 4 space(s) but used 2 space(s)`,
+				},
+				{
+					position: &Position{4, -1},
+					message:  `Expected indent with 4 space(s) but used 2 space(s)`,
+				},
+			},
+		},
 	}
 
 	for _, tt := range tests {
@@ -189,60 +235,127 @@ func TestDetectSoftIndentWidth(t *testing.T) {
 	}
 
 	tests := []struct {
-		src  [][]byte
-		want int
+		src        [][]byte
+		javadocPos []*columnRange
+		want       int
 	}{
-		{lines(
-			".",
-			".",
-		), 0},
-		{lines(
-			".",
-			"  .",
-		), 2},
-		{lines(
-			"  .",
-			".",
-		), 2},
-		{lines(
-			".",
-			"  .",
-			"    .",
-		), 2},
-		{lines(
-			".",
-			"  .",
-			"  .",
-		), 2},
-		{lines(
-			".",
-			"  .",
-			"",
-		), 2},
-		{lines(
-			"{",
-			"  {",
-			"    .",
-			"",
-			"    .",
-			"",
-			"    .",
-			"",
-			"    .",
-			"",
-			"    .",
-			"  }",
-			"}",
-		), 2},
-		{lines(
-			".",
-			"  .",
-			"      .",
-		), 0}, // cannot predict
+		{
+			src: lines(
+				".",
+				".",
+			),
+			want: 0,
+		},
+		{
+			src: lines(
+				".",
+				"  .",
+			),
+			want: 2,
+		},
+		{
+			src: lines(
+				"  .",
+				".",
+			),
+			want: 2,
+		},
+		{
+			src: lines(
+				".",
+				"  .",
+				"    .",
+			),
+			want: 2,
+		},
+		{
+			src: lines(
+				".",
+				"  .",
+				"  .",
+			),
+			want: 2,
+		},
+		{
+			src: lines(
+				".",
+				"  .",
+				"",
+			),
+			want: 2,
+		},
+		{
+			src: lines(
+				"{",
+				"  {",
+				"    .",
+				"",
+				"    .",
+				"",
+				"    .",
+				"",
+				"    .",
+				"",
+				"    .",
+				"  }",
+				"}",
+			),
+			want: 2,
+		},
+		{
+			src: lines(
+				".",
+				"  .",
+				"      .",
+			),
+			want: 0,
+		}, // cannot predict
+
+		// for the javadoc comment style
+		{
+			src: lines(
+				"/**",
+				" *",
+				" */",
+			),
+			javadocPos: []*columnRange{{1, 3}},
+			want:       0,
+		},
+		{
+			src: lines(
+				"/**",
+				" *",
+				" *",
+				" */",
+			),
+			javadocPos: []*columnRange{{1, 4}},
+			want:       0,
+		},
+		{
+			src: lines(
+				".",
+				"  /**",
+				"   *",
+				"   */",
+			),
+			javadocPos: []*columnRange{{2, 4}},
+			want:       2,
+		},
+		{
+			src: lines(
+				".",
+				"  /**",
+				"   *",
+				"   *",
+				"   */",
+			),
+			javadocPos: []*columnRange{{2, 5}},
+			want:       2,
+		},
 	}
 
 	for _, tt := range tests {
-		got := detectSoftIndentWidth(tt.src)
+		got := detectSoftIndentWidth(tt.src, tt.javadocPos)
 		assert.Equal(t, tt.want, got)
 	}
 }

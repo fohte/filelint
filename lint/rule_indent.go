@@ -89,19 +89,42 @@ func (r *IndentRule) Lint(src []byte) (*Result, error) {
 
 	linebreak := detectLinebreakStyle(src)
 	lines := bytes.Split(src, linebreak)
-	softIndentWidth := detectSoftIndentWidth(lines)
+
+	javadocPos := searchJavadocComments(lines)
+	softIndentWidth := detectSoftIndentWidth(lines, javadocPos)
+
 	for i, line := range lines {
-		depth := detectIndentDepth(line, softIndentWidth)
+		col := i + 1
+		hasJavadocSpace := hasJavadocSpace(col, javadocPos)
+
+		var depth int
+		if hasJavadocSpace {
+			// [1:] means truncate first one space (` *`, ` */`) for not recognizing as an indent
+			depth = detectIndentDepth(line[1:], softIndentWidth)
+		} else {
+			depth = detectIndentDepth(line, softIndentWidth)
+		}
 
 		if depth == 0 {
 			continue
 		}
 
 		line = bytes.TrimLeft(line, " \t")
-		newLine := make([]byte, 0, len(line)+r.Size*depth)
+		indentLength := r.Size * depth
+
+		if hasJavadocSpace {
+			indentLength += 1
+		}
+
+		newLine := make([]byte, 0, len(line)+indentLength)
 		indentBytes := bytes.Repeat(indent, depth)
 
 		newLine = append([]byte{}, indentBytes...)
+
+		if hasJavadocSpace {
+			newLine = append(newLine, ' ')
+		}
+
 		newLine = append(newLine, line...)
 
 		if len(newLine) != len(lines[i]) {
@@ -111,7 +134,7 @@ func (r *IndentRule) Lint(src []byte) (*Result, error) {
 			} else if bytes.HasPrefix(lines[i], []byte(" ")) {
 				errmsg = fmt.Sprintf(`%s but used %d space(s)`, expectMsg, softIndentWidth)
 			}
-			res.AddReport(i+1, -1, errmsg)
+			res.AddReport(col, -1, errmsg)
 		}
 
 		lines[i] = newLine
@@ -119,6 +142,62 @@ func (r *IndentRule) Lint(src []byte) (*Result, error) {
 	res.Set(bytes.Join(lines, linebreak))
 
 	return res, nil
+}
+
+func searchJavadocComments(lines [][]byte) []*columnRange {
+	var crs []*columnRange
+	var cr *columnRange
+	var inJavadoc bool
+
+	for i := 1; i < len(lines); i++ {
+		bef := i - 1
+		beforeLine := lines[bef]
+		currentLine := lines[i]
+
+		if index := bytes.Index(beforeLine, []byte("/**")); index >= 0 &&
+			bytes.Index(currentLine[index:], []byte(" *")) >= 0 {
+			inJavadoc = true
+			cr = &columnRange{
+				begin: bef + 1,
+			}
+			continue
+		}
+
+		if inJavadoc {
+			if index := bytes.Index(beforeLine, []byte(" *")); index >= 0 &&
+				bytes.Index(currentLine[index:], []byte(" *")) >= 0 {
+				if index >= 0 && bytes.Index(currentLine[index:], []byte(" */")) >= 0 {
+					inJavadoc = false
+					cr.end = i + 1
+				}
+			} else {
+				inJavadoc = false
+				cr = nil
+			}
+		}
+
+		if !inJavadoc && cr != nil {
+			crs = append(crs, cr)
+			cr = nil
+		}
+	}
+
+	return crs
+}
+
+func hasJavadocSpace(col int, javadocPos []*columnRange) bool {
+	for _, pos := range javadocPos {
+		p := &columnRange{
+			begin: pos.begin + 1, // +1 means skip the `/**` line (starts javadoc comments)
+			end:   pos.end,
+		}
+
+		// before line is ` *` or ` */`
+		if p.in(col) {
+			return true
+		}
+	}
+	return false
 }
 
 func detectIndentDepth(line []byte, softIndentWidth int) int {
@@ -145,16 +224,29 @@ func detectIndentDepth(line []byte, softIndentWidth int) int {
 	return n
 }
 
-func detectSoftIndentWidth(lines [][]byte) int {
+func detectSoftIndentWidth(lines [][]byte, javadocPos []*columnRange) int {
 	predict := map[int]int{} // { indentWidth: frequency }
 
 	for i := 1; i < len(lines); i++ {
-		if len(lines[i-1]) == 0 || len(lines[i]) == 0 { // if line has no characters
+		beforeLine := lines[i-1]
+		currentLine := lines[i]
+
+		if len(beforeLine) == 0 || len(currentLine) == 0 { // if line has no characters
 			continue
 		}
 
-		before := countFirstSpaces(lines[i-1])
-		current := countFirstSpaces(lines[i])
+		col := i + 1
+
+		// [1:] means truncate first one space (` *`, ` */`) for not recognizing as an indentation space
+		if hasJavadocSpace(col-1, javadocPos) {
+			beforeLine = beforeLine[1:]
+		}
+		if hasJavadocSpace(col, javadocPos) {
+			currentLine = currentLine[1:]
+		}
+
+		before := countFirstSpaces(beforeLine)
+		current := countFirstSpaces(currentLine)
 
 		if before == current {
 			continue

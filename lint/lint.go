@@ -122,3 +122,12 @@ func (pos *Position) String() string {
 
 	return fmt.Sprintf("%s:%s", y, x)
 }
+
+type columnRange struct {
+	begin int
+	end   int
+}
+
+func (cr *columnRange) in(col int) bool {
+	return cr.begin <= col && col <= cr.end
+}
