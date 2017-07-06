@@ -1,9 +1,9 @@
 package cli
 
 import (
-	"bufio"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"runtime"
@@ -67,6 +67,13 @@ func Execute() {
 }
 
 func execute(cmd *cobra.Command, args []string) error {
+	var out io.Writer
+	if quiet {
+		out = ioutil.Discard
+	} else {
+		out = os.Stdout
+	}
+
 	if showVersion {
 		fmt.Printf("filelint v%s [%s %s-%s]\n", Version, runtime.Version(), runtime.GOOS, runtime.GOARCH)
 		return nil
@@ -86,11 +93,9 @@ func execute(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return Raise(err)
 		}
-		buf := bufio.NewWriter(os.Stdout)
 		for _, f := range fs {
-			fmt.Fprintln(buf, f)
+			fmt.Fprintln(out, f)
 		}
-		buf.Flush()
 		return nil
 	}
 
@@ -99,11 +104,9 @@ func execute(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return Raise(err)
 		}
-		fmt.Printf("%s", yml)
+		fmt.Fprintf(out, "%s", yml)
 		return nil
 	}
-
-	buf := bufio.NewWriter(os.Stdout)
 
 	linterResult := struct {
 		numErrors      int
@@ -130,10 +133,12 @@ func execute(cmd *cobra.Command, args []string) error {
 
 			for _, report := range result.Reports {
 				if autofix {
-					fmt.Fprintf(buf, "[autofixed]")
+					fmt.Fprintf(out, "[autofixed]")
 					linterResult.numFixedErrors++
 				}
-				fmt.Fprintf(buf, "%s:%s\n", file, report.String())
+				if !quiet {
+					fmt.Fprintf(out, "%s:%s\n", file, report.String())
+				}
 			}
 
 			if autofix {
@@ -149,17 +154,13 @@ func execute(cmd *cobra.Command, args []string) error {
 		return Raise(err)
 	}
 
-	if !quiet {
-		buf.Flush()
-	}
-
 	if !autofix && linterResult.numErrors > 0 {
-		fmt.Printf("%d lint error(s) detected in %d file(s)\n", linterResult.numErrors, linterResult.numErrorFiles)
+		fmt.Fprintf(out, "%d lint error(s) detected in %d file(s)\n", linterResult.numErrors, linterResult.numErrorFiles)
 		return Raise(errLintFailed)
 	}
 
-	if linterResult.numFixedFiles > 0 && !quiet {
-		fmt.Printf("%d lint error(s) autofixed in %d file(s)\n", linterResult.numFixedErrors, linterResult.numFixedFiles)
+	if linterResult.numFixedFiles > 0 {
+		fmt.Fprintf(out, "%d lint error(s) autofixed in %d file(s)\n", linterResult.numFixedErrors, linterResult.numFixedFiles)
 	}
 
 	return nil
@@ -191,7 +192,6 @@ func loadConfig(configFile string, useDefault bool) (*config.Config, error) {
 		return nil, err
 	}
 	return cfg, nil
-
 }
 
 func writeFile(filename string, src []byte) error {
