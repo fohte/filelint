@@ -4,7 +4,7 @@ import "bytes"
 
 var metadataNoEOLSpaceRule = &MetaData{
 	Name: "no-eol-space",
-	rank: 5,
+	rank: 4, // this rule should be called before first-newline and final-newline
 }
 
 type NoEOLSpaceRule struct{}
