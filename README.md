@@ -16,7 +16,27 @@ $ go get -u github.com/synchro-food/filelint
 
 ## Usage
 
-### CLI
+You can run Filelint on all text files in current directory recursively:
+```
+$ filelint
+```
+
+Or you can specify any directory:
+```
+$ filelint scripts/
+```
+
+Or you can specify any files and fix them:
+```
+$ filelint README.md --fix
+```
+
+Or you can specify any path and fix them:
+```
+$ filelint README.md scripts/ --fix
+```
+
+### Options
 
 Filelint is available some flags:
 
@@ -42,29 +62,7 @@ Flags:
 The `files` optional argument is linting target files.
 If not pass `files` then all text files in current directory recursively.
 
-#### Example
-
-You can run Filelint on all text files in current directory recursively:
-```
-$ filelint
-```
-
-Or you can specify any directory:
-```
-$ filelint scripts/
-```
-
-Or you can specify any files and fix them:
-```
-$ filelint README.md --fix
-```
-
-Or you can specify any path and fix them:
-```
-$ filelint README.md scripts/ --fix
-```
-
-### Configulation
+## Configulation
 
 Filelint can configure lint rule settings and format target files via `.filelint.yml`.  
 `.filelint.yml` is searched in current directory, repo root directory if you use git, or `$HOME`.
@@ -86,7 +84,7 @@ targets:
         <option-key>: <option-value>
         # ...
       # ...
-  # `group-name` can use anything except `default` available
+  # `group-name` can use anything name except `default`
   <group-name>:
     # `patterns` is the specific target files for this group
     patterns:
@@ -97,3 +95,93 @@ targets:
 ```
 
 The default configulation is [here](https://github.com/synchro-food/filelint/blob/master/config/default.yml).
+
+## Rules
+
+### `linebreak`
+
+This rule enforces consistent linebreak style to Unix style (LF) or Windows style (CRLF).
+
+- default: no enforce
+
+#### Options
+
+##### `style`
+
+This option specify the line endings (LF or CRLF).
+LF is the Unix line endings (`\n`), and CRLF is the Windows line endings (`\r\n`).
+
+- default: `lf`
+- available values: `lf` or `crlf` (case insensitive)
+
+### `first-newline`
+
+This rule enforces some newlines at first of files.
+
+- default: enforce
+
+#### Options
+
+##### `num`
+
+This option specify the number of newlines at first of files.
+
+- default: `0`
+- available values: positive integers
+
+### `final-newline`
+
+This rule enforces some newlines at final of files.
+
+- default: enforce
+
+#### Options
+
+##### `num`
+
+This option specify the number of newlines at first of files.
+
+- default: `1`
+- available values: positive integers
+
+### `no-eol-space`
+
+This rule enforces no trailing whitespaces and tabs at the end of lines.
+
+- default: enforce
+
+#### Options
+
+This rule has no options.
+
+### `indent` (experimental)
+
+**This rule is experimental. We recommend to use other linter tools that can analyze syntax of codes.**
+
+This rule enforces a consistent indentation style to the any code and text.
+
+- default: enforce
+
+##### `style`
+
+This option specify the indentation style.
+
+- default: `soft`
+- available values: `soft`/`space` or `hard`/`tab`
+
+##### `size`
+
+This option specify number of whitespaces for the `soft` indentation style.
+
+- default: `2`
+- available values: positive numbers
+
+### `no-bom`
+
+This rule enforces no byte order marks (BOM) of UTF-8 to any text files.
+
+- default: enforce
+
+#### Options
+
+This rule has no options.
