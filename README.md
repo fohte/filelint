@@ -4,6 +4,8 @@
 
 Filelint is a CLI tool for linting any text file following some file format.
 
+![filelint-example](https://user-images.githubusercontent.com/11088009/27952943-16962632-6345-11e7-896f-f6d43aff084b.gif)
+
 ## Installation
 
 You can download the binary from [the release page](https://github.com/synchro-food/filelint/releases) and place it in `$PATH` directories.
