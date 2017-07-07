@@ -102,7 +102,7 @@ The default configulation is [here](https://github.com/synchro-food/filelint/blo
 
 This rule enforces consistent linebreak style to Unix style (LF) or Windows style (CRLF).
 
-- default: no enforce
+- default: enforce
 
 #### Options
 
@@ -160,7 +160,7 @@ This rule has no options.
 
 This rule enforces a consistent indentation style to the any code and text.
 
-- default: enforce
+- default: no enforce
 
 ##### `style`
 
