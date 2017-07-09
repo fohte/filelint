@@ -2,11 +2,9 @@ package dispatcher
 
 import (
 	"fmt"
-	"path/filepath"
 
 	gitignore "github.com/sabhiram/go-gitignore"
 	"github.com/synchro-food/filelint/config"
-	"github.com/synchro-food/filelint/lib"
 	"github.com/synchro-food/filelint/lint"
 )
 
@@ -21,7 +19,7 @@ func NewDispatcher(cfg *config.Config) *Dispatcher {
 }
 
 func (dp *Dispatcher) Dispatch(
-	useGitIgnore bool,
+	gitignorePath string,
 	onDipatched func(file string, rules []lint.Rule) error,
 ) error {
 	files, err := dp.config.File.FindTargets()
@@ -29,12 +27,8 @@ func (dp *Dispatcher) Dispatch(
 		return err
 	}
 
-	if useGitIgnore {
-		gi, err := findGitIgnore()
-		if err != nil {
-			return err
-		}
-		files, err = excludeFilesWithGitIgnore(files, gi)
+	if gitignorePath != "" {
+		files, err = excludeFilesWithGitIgnore(files, gitignorePath)
 		if err != nil {
 			return err
 		}
@@ -81,20 +75,4 @@ func excludeFilesWithGitIgnore(files []string, gitignorePath string) ([]string, 
 	}
 
 	return newFiles, nil
-}
-
-func findGitIgnore() (string, error) {
-	gitRoot, err := lib.FindGitRootPath(".")
-
-	if err != nil {
-		if err == lib.ErrNotGitRepository {
-			return "", nil
-		} else {
-			return "", err
-		}
-	}
-
-	gitignorePath := filepath.Join(gitRoot, ".gitignore")
-
-	return gitignorePath, nil
 }

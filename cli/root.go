@@ -116,7 +116,12 @@ func execute(cmd *cobra.Command, args []string) error {
 	}{}
 
 	dp := dispatcher.NewDispatcher(cfg)
-	if err := dp.Dispatch(useGitIgnore, func(file string, rules []lint.Rule) error {
+	gitignorePath, err := lib.FindGitIgnore()
+	if err != nil && err != lib.ErrNotGitRepository {
+		return err
+	}
+
+	if err := dp.Dispatch(gitignorePath, func(file string, rules []lint.Rule) error {
 		linter, err := lint.NewLinter(file, rules)
 		if err != nil {
 			return err
