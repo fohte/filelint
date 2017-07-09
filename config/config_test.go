@@ -43,19 +43,24 @@ func TestConfig_Merge(t *testing.T) {
 			want: &Config{File: File{Exclude: []string{"a"}}},
 		},
 		{
-			src:  &Config{Targets: map[string]Target{"default": {}}},
-			dst:  &Config{Targets: map[string]Target{"go": {}}},
-			want: &Config{Targets: map[string]Target{"default": {}, "go": {}}},
-		},
-		{
-			src:  &Config{Targets: map[string]Target{}},
-			dst:  &Config{Targets: map[string]Target{"go": {}}},
-			want: &Config{Targets: map[string]Target{"go": {}}},
-		},
-		{
-			src:  &Config{Targets: map[string]Target{"default": {}}},
-			dst:  &Config{Targets: map[string]Target{}},
-			want: &Config{Targets: map[string]Target{"default": {}}},
+			src: &Config{Targets: []Target{Target{
+				Patterns: []string{"*"},
+				Rule:     RuleMap{},
+			}}},
+			dst: &Config{Targets: []Target{Target{
+				Patterns: []string{"*"},
+				Rule:     RuleMap{},
+			}}},
+			want: &Config{Targets: []Target{
+				{
+					Patterns: []string{"*"},
+					Rule:     RuleMap{},
+				},
+				{
+					Patterns: []string{"*"},
+					Rule:     RuleMap{},
+				},
+			}},
 		},
 	}
 
@@ -65,142 +70,118 @@ func TestConfig_Merge(t *testing.T) {
 	}
 }
 
-func TestTargetMap_ExtendDefaultTarget(t *testing.T) {
+func TestConfig_MatchedRule(t *testing.T) {
 	tests := []struct {
-		msg  string
-		src  TargetMap
-		want TargetMap
+		src  []Target
+		file string
+		want RuleMap
 	}{
 		{
-			msg: "non `default` existing values should not overwrite with `default` values",
-			src: TargetMap{
-				"default": Target{Rule: RuleMap{"a": {"op": "default"}}},
-				"go":      Target{Rule: RuleMap{"a": {"op": "go"}}},
+			src: []Target{
+				{
+					Patterns: []string{"**/*"},
+					Rule:     RuleMap{"a": {"A": 1}},
+				},
 			},
-			want: TargetMap{
-				"default": Target{Rule: RuleMap{"a": {"op": "default"}}},
-				"go":      Target{Rule: RuleMap{"a": {"op": "go"}}},
-			},
+			file: "path/to/a",
+			want: RuleMap{"a": {"A": 1}},
 		},
 		{
-			msg: "if non `default` dosen't have values then should be set with `default` values",
-			src: TargetMap{
-				"default": Target{Rule: RuleMap{"a": {"A": 1, "B": 1}}},
-				"go":      Target{Rule: RuleMap{"a": {"B": 2}}},
+			src: []Target{
+				{
+					Patterns: []string{"**/*"},
+					Rule:     RuleMap{"a": {"A": 1}},
+				},
+				{
+					Patterns: []string{"**/*.go"},
+					Rule:     RuleMap{"a": {"A": 2}},
+				},
 			},
-			want: TargetMap{
-				"default": Target{Rule: RuleMap{"a": {"A": 1, "B": 1}}},
-				"go":      Target{Rule: RuleMap{"a": {"A": 1, "B": 2}}},
-			},
+			file: "path/to/a",
+			want: RuleMap{"a": {"A": 1}},
 		},
 		{
-			msg: "if non `default` dosen't have values then should be set with `default` values",
-			src: TargetMap{
-				"default": Target{Rule: RuleMap{"a": {"op": "default"}}},
-				"go":      Target{Rule: RuleMap{}},
+			src: []Target{
+				{
+					Patterns: []string{"**/*"},
+					Rule:     RuleMap{"a": {"A": 1}},
+				},
+				{
+					Patterns: []string{"**/*.go"},
+					Rule:     RuleMap{"a": {"A": 2}},
+				},
 			},
-			want: TargetMap{
-				"default": Target{Rule: RuleMap{"a": {"op": "default"}}},
-				"go":      Target{Rule: RuleMap{"a": {"op": "default"}}},
-			},
+			file: "path/to/a.go",
+			want: RuleMap{"a": {"A": 2}},
 		},
 		{
-			msg: "if non `default` dosen't have values then should be set with `default` values",
-			src: TargetMap{
-				"default": Target{Rule: RuleMap{"a": {"op": "default"}}},
-				"go":      Target{Rule: RuleMap{"a": {}}},
+			src: []Target{
+				{
+					Patterns: []string{"**/*"},
+					Rule:     RuleMap{"a": {"A": 1}},
+				},
+				{
+					Patterns: []string{"**/*"},
+					Rule:     RuleMap{"a": {"A": 2}},
+				},
 			},
-			want: TargetMap{
-				"default": Target{Rule: RuleMap{"a": {"op": "default"}}},
-				"go":      Target{Rule: RuleMap{"a": {"op": "default"}}},
-			},
-		},
-		{
-			src: TargetMap{
-				"go": Target{Rule: RuleMap{"a": {"op": "go"}}},
-			},
-			want: TargetMap{
-				"go": Target{Rule: RuleMap{"a": {"op": "go"}}},
-			},
+			file: "path/to/a",
+			want: RuleMap{"a": {"A": 2}},
 		},
 	}
 
 	for _, tt := range tests {
-		tt.src.ExtendDefaultTarget()
-		assert.Equal(t, tt.want, tt.src, tt.msg)
+		c := &Config{Targets: tt.src}
+		got := c.MatchedRule(tt.file)
+		assert.Equal(t, tt.want, got)
 	}
 }
 
-func TestTarget_Merge(t *testing.T) {
+func TestRuleMap_Merge(t *testing.T) {
 	tests := []struct {
-		src  Target
-		dst  Target
-		want Target
+		src  RuleMap
+		dst  RuleMap
+		want RuleMap
 	}{
 		{
-			src:  Target{Pattern: []string{"*"}},
-			dst:  Target{Pattern: []string{"**"}},
-			want: Target{Pattern: []string{"**"}},
+			src:  RuleMap{"a": {"op": 1}},
+			dst:  RuleMap{"a": {"op": 2}},
+			want: RuleMap{"a": {"op": 2}},
 		},
 		{
-			src:  Target{Pattern: []string{"*", "*"}},
-			dst:  Target{Pattern: []string{"**"}},
-			want: Target{Pattern: []string{"**"}},
+			src:  RuleMap{"a": {"op": 1}},
+			dst:  RuleMap{"a": {}},
+			want: RuleMap{"a": {"op": 1}},
 		},
 		{
-			src:  Target{Pattern: []string{"*"}},
-			dst:  Target{Pattern: []string{"**", "**"}},
-			want: Target{Pattern: []string{"**", "**"}},
+			src:  RuleMap{"a": {}},
+			dst:  RuleMap{"a": {"op": 1}},
+			want: RuleMap{"a": {"op": 1}},
 		},
 		{
-			src:  Target{Pattern: []string{}},
-			dst:  Target{Pattern: []string{"*"}},
-			want: Target{Pattern: []string{"*"}},
+			src:  RuleMap{},
+			dst:  RuleMap{"a": {"op": 1}},
+			want: RuleMap{"a": {"op": 1}},
 		},
 		{
-			src:  Target{Pattern: []string{"*"}},
-			dst:  Target{Pattern: []string{}},
-			want: Target{Pattern: []string{"*"}},
+			src:  RuleMap{"a": {"op": 1}},
+			dst:  RuleMap{},
+			want: RuleMap{"a": {"op": 1}},
 		},
 		{
-			src:  Target{Rule: RuleMap{"a": {"op": 1}}},
-			dst:  Target{Rule: RuleMap{"a": {"op": 2}}},
-			want: Target{Rule: RuleMap{"a": {"op": 2}}},
+			src:  RuleMap{"a": {"op": false}},
+			dst:  RuleMap{"a": {"op": true}},
+			want: RuleMap{"a": {"op": true}},
 		},
 		{
-			src:  Target{Rule: RuleMap{"a": {"op": 1}}},
-			dst:  Target{Rule: RuleMap{"a": {}}},
-			want: Target{Rule: RuleMap{"a": {"op": 1}}},
+			src:  RuleMap{"a": {"op": true}},
+			dst:  RuleMap{"a": {"op": false}},
+			want: RuleMap{"a": {"op": false}},
 		},
 		{
-			src:  Target{Rule: RuleMap{"a": {}}},
-			dst:  Target{Rule: RuleMap{"a": {"op": 1}}},
-			want: Target{Rule: RuleMap{"a": {"op": 1}}},
-		},
-		{
-			src:  Target{Rule: RuleMap{}},
-			dst:  Target{Rule: RuleMap{"a": {"op": 1}}},
-			want: Target{Rule: RuleMap{"a": {"op": 1}}},
-		},
-		{
-			src:  Target{Rule: RuleMap{"a": {"op": 1}}},
-			dst:  Target{Rule: RuleMap{}},
-			want: Target{Rule: RuleMap{"a": {"op": 1}}},
-		},
-		{
-			src:  Target{Rule: RuleMap{"a": {"op": false}}},
-			dst:  Target{Rule: RuleMap{"a": {"op": true}}},
-			want: Target{Rule: RuleMap{"a": {"op": true}}},
-		},
-		{
-			src:  Target{Rule: RuleMap{"a": {"op": true}}},
-			dst:  Target{Rule: RuleMap{"a": {"op": false}}},
-			want: Target{Rule: RuleMap{"a": {"op": false}}},
-		},
-		{
-			src:  Target{Rule: RuleMap{"a": {"op": true}}},
-			dst:  Target{Rule: RuleMap{"b": {"op": false}}},
-			want: Target{Rule: RuleMap{"a": {"op": true}, "b": {"op": false}}},
+			src:  RuleMap{"a": {"op": true}},
+			dst:  RuleMap{"b": {"op": false}},
+			want: RuleMap{"a": {"op": true}, "b": {"op": false}},
 		},
 	}
 
