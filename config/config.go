@@ -30,7 +30,10 @@ func NewConfig(configFile string) (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	yaml.Unmarshal(src, &userConfig)
+
+	if err := yaml.Unmarshal(src, &userConfig); err != nil {
+		return nil, err
+	}
 
 	conf.Merge(userConfig)
 	conf.Targets.ExtendDefaultTarget()
@@ -44,7 +47,11 @@ func NewDefaultConfig() (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	yaml.Unmarshal(src, &conf)
+
+	if err := yaml.Unmarshal(src, &conf); err != nil {
+		return nil, err
+	}
+
 	conf.Targets.ExtendDefaultTarget()
 	return conf, nil
 }
