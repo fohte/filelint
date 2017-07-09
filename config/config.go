@@ -15,8 +15,8 @@ import (
 )
 
 type Config struct {
-	File    File      `yaml:"files"`
-	Targets TargetMap `yaml:"targets"`
+	File    File     `yaml:"files"`
+	Targets []Target `yaml:"targets"`
 }
 
 func NewConfig(configFile string) (*Config, error) {
@@ -36,7 +36,6 @@ func NewConfig(configFile string) (*Config, error) {
 	}
 
 	conf.Merge(userConfig)
-	conf.Targets.ExtendDefaultTarget()
 
 	return conf, nil
 }
@@ -52,7 +51,6 @@ func NewDefaultConfig() (*Config, error) {
 		return nil, err
 	}
 
-	conf.Targets.ExtendDefaultTarget()
 	return conf, nil
 }
 
@@ -61,27 +59,19 @@ func (src *Config) Merge(dst *Config) {
 		src.File.Include = dst.File.Include
 	}
 	src.File.Exclude = append(src.File.Exclude, dst.File.Exclude...)
-
-	for key, target := range dst.Targets {
-		if _, ok := src.Targets[key]; ok {
-			src.Targets[key] = src.Targets[key].Merge(target)
-		} else {
-			src.Targets[key] = target
-		}
-	}
+	src.Targets = append(src.Targets, dst.Targets...)
 }
 
 func (cfg *Config) MatchedRule(file string) RuleMap {
-	for k, t := range cfg.Targets {
-		if k == "default" {
-			continue
-		}
-		if match(file, t.Pattern) {
-			return t.Rule
+	rm := make(RuleMap)
+
+	for _, t := range cfg.Targets {
+		if match(file, t.Patterns) {
+			rm = rm.Merge(t.Rule)
 		}
 	}
 
-	return cfg.Targets["default"].Rule
+	return rm
 }
 
 func match(file string, patterns []string) bool {
@@ -170,56 +160,28 @@ func addGlobSignIfDir(files ...string) (dst []string) {
 	return dst
 }
 
-type TargetMap map[string]Target
-
-func (tm TargetMap) ExtendDefaultTarget() {
-	if !tm.hasDefaultTarget() {
-		return
-	}
-
-	for k, t := range tm {
-		if k == "default" {
-			continue
-		}
-		tm[k] = tm["default"].Merge(t)
-	}
-}
-
-func (tm TargetMap) hasDefaultTarget() bool {
-	for k := range tm {
-		if k == "default" {
-			return true
-		}
-	}
-	return false
-}
-
 type Target struct {
-	Pattern []string `yaml:"patterns"`
-	Rule    RuleMap  `yaml:"rules"`
+	Patterns []string `yaml:"patterns"`
+	Rule     RuleMap  `yaml:"rules"`
 }
 
-func (src Target) Merge(dst Target) (ret Target) {
-	ret = deepcopy.Copy(src).(Target)
+type RuleMap map[string]map[string]interface{}
 
-	if len(dst.Pattern) > 0 {
-		ret.Pattern = dst.Pattern
-	}
+func (rm RuleMap) Merge(dst RuleMap) (ret RuleMap) {
+	ret = deepcopy.Copy(rm).(RuleMap)
 
-	for ruleName, options := range dst.Rule {
-		if _, ok := ret.Rule[ruleName]; ok {
+	for ruleName, options := range dst {
+		if _, ok := ret[ruleName]; ok {
 			for optionKey, value := range options {
-				ret.Rule[ruleName][optionKey] = value
+				ret[ruleName][optionKey] = value
 			}
 		} else {
-			ret.Rule[ruleName] = options
+			ret[ruleName] = options
 		}
 	}
 
 	return ret
 }
-
-type RuleMap map[string]map[string]interface{}
 
 var (
 	fileName   = ".filelint.yml"

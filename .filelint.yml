@@ -2,7 +2,7 @@ files:
   exclude:
     - '**/bindata.go'
 targets:
-  default:
+  - patterns: ['**/*']
     rules:
       linebreak:
         enforce: true
@@ -21,16 +21,12 @@ targets:
         enforce: true
         style: soft
         size: 2
-  go:
-    patterns:
-      - '**/*.go'
+  - patterns: ['**/*.go']
     rules:
       indent:
         enforce: true
         style: hard
-  markdown:
-    patterns:
-      - '**/*.md'
+  - patterns: ['**/*.md']
     rules:
       no-eol-space:
         enforce: false

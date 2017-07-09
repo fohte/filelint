@@ -5,7 +5,7 @@ files:
     - '.git/**/*'
 
 targets:
-  default:
+  - patterns: ['**/*']
     rules:
       indent:
         enforce: false
