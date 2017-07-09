@@ -78,22 +78,19 @@ files:
   exclude:
     - 'exclude/path/to'
 targets:
-  # `default` group is applies all files and other groups extend from this group
-  default:
+  - patterns: ['**/*'] # `patterns` is an array of string, this pattern specify target files for this group
     rules:
       <rule-name>:
         enforce: true # or false
         <option-key>: <option-value>
         # ...
       # ...
-  # `group-name` can use anything name except `default`
-  <group-name>:
-    # `patterns` is the specific target files for this group
-    patterns:
+  - patterns: # these rules apply to only .md and .mkd files
       - '**/*.md'
+      - '**/*.mkd'
     rules:
       # ...
-  # ...
+  # and other patterns and rules ...
 ```
 
 The default configulation is [here](https://github.com/synchro-food/filelint/blob/master/config/default.yml).
