@@ -98,7 +98,8 @@ type File struct {
 }
 
 func (f File) FindTargets() ([]string, error) {
-	f.addGlobSignIfDir()
+	f.Include = addGlobSignIfDir(f.Include...)
+	f.Exclude = addGlobSignIfDir(f.Exclude...)
 
 	inSet, err := expandGlob(f.Include)
 	if err != nil {
@@ -115,11 +116,6 @@ func (f File) FindTargets() ([]string, error) {
 	files = lib.FindTextFiles(files)
 
 	return files, nil
-}
-
-func (f File) addGlobSignIfDir() {
-	f.Include = addGlobSignIfDir(f.Include...)
-	f.Exclude = addGlobSignIfDir(f.Exclude...)
 }
 
 func expandGlob(files []string) (*set.Set, error) {
