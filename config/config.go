@@ -10,6 +10,7 @@ import (
 
 	"github.com/fatih/set"
 	zglob "github.com/mattn/go-zglob"
+	homedir "github.com/mitchellh/go-homedir"
 	"github.com/mohae/deepcopy"
 	"github.com/synchro-food/filelint/lib"
 )
@@ -184,23 +185,28 @@ var (
 	searchPath = "."
 )
 
-func SearchConfigFile() (f string, ok bool) {
+func SearchConfigFile() (f string, ok bool, err error) {
 	if f := filepath.Join(searchPath, fileName); lib.IsExist(f) {
-		return f, true
+		return f, true, nil
 	}
 
 	if gitRoot, err := lib.FindGitRootPath(searchPath); err != nil {
-		if err != nil && err != lib.ErrNotGitRepository {
-			return "", false
+		if err != lib.ErrNotGitRepository {
+			return "", false, err
 		}
+	} else {
 		if f := filepath.Join(gitRoot, fileName); lib.IsExist(f) {
-			return f, true
+			return f, true, nil
 		}
 	}
 
-	if f := filepath.Join(lib.GetHomeDir(), fileName); lib.IsExist(f) {
-		return f, true
+	if home, err := homedir.Dir(); err != nil {
+		return "", false, err
+	} else {
+		if f := filepath.Join(home, fileName); lib.IsExist(f) {
+			return f, true, nil
+		}
 	}
 
-	return "", false
+	return "", false, nil
 }

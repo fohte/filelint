@@ -186,7 +186,11 @@ func loadConfig(configFile string, useDefault bool) (*config.Config, error) {
 
 	if configFile == "" {
 		var exist bool
-		configFile, exist = config.SearchConfigFile()
+		var err error
+		configFile, exist, err = config.SearchConfigFile()
+		if err != nil {
+			return nil, err
+		}
 		if !exist {
 			return loadConfig("", true)
 		}
