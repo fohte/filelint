@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/synchro-food/filelint.svg?branch=master)](https://travis-ci.org/synchro-food/filelint)
 
-Filelint is a CLI tool for linting any text file following some file format.
+Filelint is a CLI tool for linting any text file following some coding style.
 
 ![filelint-example](https://user-images.githubusercontent.com/11088009/27952943-16962632-6345-11e7-896f-f6d43aff084b.gif)
 
@@ -44,7 +44,7 @@ Filelint is available some flags:
 
 ```
 $ filelint --help
-Filelint is a CLI tool for linting any text file following some file format.
+Filelint is a CLI tool for linting any text file following some coding style.
 
 Usage:
   filelint [files...] [flags]

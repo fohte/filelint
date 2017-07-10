@@ -22,8 +22,8 @@ const Version = "0.1.0-beta.4"
 
 var rootCmd = &cobra.Command{
 	Use:           "filelint [files...]",
-	Short:         "lint any text file following some file format",
-	Long:          `Filelint is a CLI tool for linting any text file following some file format.`,
+	Short:         "lint any text file following some coding style",
+	Long:          `Filelint is a CLI tool for linting any text file following some coding style.`,
 	RunE:          execute,
 	SilenceUsage:  true,
 	SilenceErrors: true,
