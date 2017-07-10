@@ -3,6 +3,7 @@ files:
     - './**/*'
   exclude:
     - '.git/**/*'
+    - '**/*.pdf'
 
 targets:
   - patterns: ['**/*']
