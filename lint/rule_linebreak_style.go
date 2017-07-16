@@ -104,5 +104,5 @@ func detectLinebreakStyle(bs []byte) LinebreakStyle {
 }
 
 func init() {
-	DefinedRules.Set(&LinebreakRule{})
+	definedRules.Set(&LinebreakRule{})
 }

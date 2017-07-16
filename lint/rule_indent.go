@@ -291,5 +291,5 @@ func countFirstSpaces(cs []byte) int {
 }
 
 func init() {
-	DefinedRules.Set(&IndentRule{})
+	definedRules.Set(&IndentRule{})
 }

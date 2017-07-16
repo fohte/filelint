@@ -40,5 +40,5 @@ func (r *NoEOLSpaceRule) Lint(s []byte) (*Result, error) {
 }
 
 func init() {
-	DefinedRules.Set(&NoEOLSpaceRule{})
+	definedRules.Set(&NoEOLSpaceRule{})
 }

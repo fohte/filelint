@@ -5,7 +5,11 @@ import (
 	"strconv"
 )
 
-var DefinedRules = NewRuleMap()
+var definedRules = NewRuleMap()
+
+func GetDefinedRules() *RuleMap {
+	return definedRules
+}
 
 type RuleMap struct {
 	m map[string]Rule

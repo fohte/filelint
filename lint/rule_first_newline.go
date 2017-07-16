@@ -87,5 +87,5 @@ func countFirstNewlines(s []byte) int {
 }
 
 func init() {
-	DefinedRules.Set(&FirstNewlineRule{})
+	definedRules.Set(&FirstNewlineRule{})
 }

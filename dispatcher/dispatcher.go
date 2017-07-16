@@ -35,17 +35,18 @@ func (dp *Dispatcher) Dispatch(
 	}
 
 	for _, file := range files {
-		rules := make([]lint.Rule, 0, lint.DefinedRules.Size())
+		definedRules := lint.GetDefinedRules()
+		rules := make([]lint.Rule, 0, definedRules.Size())
 		userRules := dp.config.MatchedRule(file)
 
 		for ruleName, options := range userRules {
-			if !lint.DefinedRules.Has(ruleName) {
+			if !definedRules.Has(ruleName) {
 				return fmt.Errorf("%s is undefined", ruleName)
 			}
 			if options["enforce"] != true {
 				continue
 			}
-			rule, err := lint.DefinedRules.Get(ruleName).New(options)
+			rule, err := definedRules.Get(ruleName).New(options)
 			if err != nil {
 				return err
 			}

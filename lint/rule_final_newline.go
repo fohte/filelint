@@ -89,5 +89,5 @@ func countFinalNewlines(s []byte) int {
 }
 
 func init() {
-	DefinedRules.Set(&FinalNewlineRule{})
+	definedRules.Set(&FinalNewlineRule{})
 }

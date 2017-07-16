@@ -39,5 +39,5 @@ func (r *NoBOMRule) Lint(s []byte) (*Result, error) {
 var UTF8BOMs = []byte{0xEF, 0xbb, 0xbf}
 
 func init() {
-	DefinedRules.Set(&NoBOMRule{})
+	definedRules.Set(&NoBOMRule{})
 }
