@@ -35,7 +35,7 @@ func NewLinebreakStyle(str string) (LinebreakStyle, error) {
 	return nil, ErrUnknownLinebreakStyle
 }
 
-func (s LinebreakStyle) text() string {
+func (s LinebreakStyle) String() string {
 	switch {
 	case bytes.Equal(s, UnixStyleLinebreak):
 		return "LF"
@@ -86,8 +86,8 @@ func (r *LinebreakRule) Lint(s []byte) (*Result, error) {
 
 	errmsg := fmt.Sprintf(
 		`Expected linebreaks to be %s but found %s`,
-		r.Style.text(),
-		formatTarget.text(),
+		r.Style,
+		formatTarget,
 	)
 	res.AddReport(-1, -1, errmsg)
 	res.Set(bytes.Replace(s, formatTarget, r.Style, -1))
