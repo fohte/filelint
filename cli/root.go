@@ -30,15 +30,26 @@ var rootCmd = &cobra.Command{
 }
 
 var (
-	showVersion      bool
 	configFile       string
+	isShowVersion    bool
+	isPrintConfig    bool
+	isPrintTarget    bool
+	isAutofix        bool
+	isQuiet          bool
 	useDefaultConfig bool
-	printConfig      bool
-	autofix          bool
-	quiet            bool
-	showTargets      bool
 	useGitIgnore     bool
 )
+
+func init() {
+	rootCmd.Flags().StringVarP(&configFile, "config", "c", "", "specify configuration file")
+	rootCmd.Flags().BoolVarP(&isShowVersion, "version", "v", false, "print the version and quit")
+	rootCmd.Flags().BoolVar(&isPrintConfig, "print-config", false, "print the configuration")
+	rootCmd.Flags().BoolVar(&isPrintTarget, "print-targets", false, "print all lint target files and quit")
+	rootCmd.Flags().BoolVar(&isAutofix, "fix", false, "automatically fix problems")
+	rootCmd.Flags().BoolVarP(&isQuiet, "quiet", "q", false, "don't print lint errors or fixed files")
+	rootCmd.Flags().BoolVar(&useDefaultConfig, "no-config", false, "don't use config file (use the application default config)")
+	rootCmd.Flags().BoolVar(&useGitIgnore, "use-gitignore", true, "(experimental) read and use .gitignore file for excluding target files")
+}
 
 var (
 	ErrNoSuchConfigFile = errors.New("no such config file")
@@ -68,13 +79,13 @@ func Execute() {
 
 func execute(cmd *cobra.Command, args []string) error {
 	var out io.Writer
-	if quiet {
+	if isQuiet {
 		out = ioutil.Discard
 	} else {
 		out = os.Stdout
 	}
 
-	if showVersion {
+	if isShowVersion {
 		fmt.Printf("filelint v%s [%s %s-%s]\n", Version, runtime.Version(), runtime.GOOS, runtime.GOARCH)
 		return nil
 	}
@@ -88,7 +99,7 @@ func execute(cmd *cobra.Command, args []string) error {
 		cfg.File.Include = args
 	}
 
-	if showTargets {
+	if isPrintTarget {
 		fs, err := cfg.File.FindTargets()
 		if err != nil {
 			return Raise(err)
@@ -99,7 +110,7 @@ func execute(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	if printConfig {
+	if isPrintConfig {
 		yml, err := yaml.Marshal(cfg)
 		if err != nil {
 			return Raise(err)
@@ -137,16 +148,16 @@ func execute(cmd *cobra.Command, args []string) error {
 			linterResult.numErrorFiles++
 
 			for _, report := range result.Reports {
-				if autofix {
+				if isAutofix {
 					fmt.Fprintf(out, "[autofixed]")
 					linterResult.numFixedErrors++
 				}
-				if !quiet {
+				if !isQuiet {
 					fmt.Fprintf(out, "%s:%s\n", file, report.String())
 				}
 			}
 
-			if autofix {
+			if isAutofix {
 				if err := writeFile(file, result.Fixed); err != nil {
 					return err
 				}
@@ -159,7 +170,7 @@ func execute(cmd *cobra.Command, args []string) error {
 		return Raise(err)
 	}
 
-	if !autofix && linterResult.numErrors > 0 {
+	if !isAutofix && linterResult.numErrors > 0 {
 		fmt.Fprintf(out, "%d lint error(s) detected in %d file(s)\n", linterResult.numErrors, linterResult.numErrorFiles)
 		return Raise(errLintFailed)
 	}
@@ -229,15 +240,4 @@ func writeFile(filename string, src []byte) error {
 	}
 
 	return nil
-}
-
-func init() {
-	rootCmd.Flags().BoolVarP(&showVersion, "version", "v", false, "print the version and quit")
-	rootCmd.Flags().StringVarP(&configFile, "config", "c", "", "specify configuration file")
-	rootCmd.Flags().BoolVarP(&printConfig, "print-config", "", false, "print the configuration")
-	rootCmd.Flags().BoolVarP(&useDefaultConfig, "no-config", "", false, "don't use config file (use the application default config)")
-	rootCmd.Flags().BoolVarP(&autofix, "fix", "", false, "automatically fix problems")
-	rootCmd.Flags().BoolVarP(&quiet, "quiet", "q", false, "don't print lint errors or fixed files")
-	rootCmd.Flags().BoolVarP(&showTargets, "print-targets", "", false, "print all lint target files and quit")
-	rootCmd.Flags().BoolVarP(&useGitIgnore, "use-gitignore", "", true, "(experimental) read and use .gitignore file for excluding target files")
 }
