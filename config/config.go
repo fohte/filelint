@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	yaml "gopkg.in/yaml.v2"
@@ -115,6 +116,8 @@ func (f File) FindTargets() ([]string, error) {
 	fileSet := set.Difference(inSet, exSet)
 	files := set.StringSlice(fileSet)
 	files = lib.FindTextFiles(files)
+
+	sort.Strings(files)
 
 	return files, nil
 }
