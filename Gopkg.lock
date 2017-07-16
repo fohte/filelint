@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  branch = "master"
+  name = "github.com/andrew-d/isbinary"
+  packages = ["."]
+  revision = "e6fe02933397c4c8747f4d6535d07e71ae85182e"
+
+[[projects]]
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
   revision = "346938d642f2ec3594ed81d874461961cd0faa76"
@@ -68,26 +74,14 @@
   version = "v1.1.4"
 
 [[projects]]
-  name = "gopkg.in/src-d/go-git.v4"
-  packages = ["utils/binary"]
-  revision = "a9920b123ba1f6819a8c03209582d4d28e9fd831"
-  version = "v4.0.0-rc9"
-
-[[projects]]
   branch = "v2"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
   revision = "3b4ad1db5b2a649883ff3782f5f9f6fb52be71af"
 
-[[projects]]
-  branch = "v4"
-  name = "srcd.works/go-git.v4"
-  packages = ["plumbing"]
-  revision = "ad02bf020460c210660db4fffda7f926b6aae95a"
-
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "a408d092bef72e29c9cbc08cc2538c9c02c0fcf572157385e249f11cc0a93b73"
+  inputs-digest = "02e90e49c4733a3e30ccabd9870c2a33908c036eebfdef2850871033c88cae60"
   solver-name = "gps-cdcl"
   solver-version = 1

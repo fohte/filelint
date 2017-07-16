@@ -2,11 +2,12 @@ package lib
 
 import (
 	"errors"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
 
-	"gopkg.in/src-d/go-git.v4/utils/binary"
+	"github.com/andrew-d/isbinary"
 )
 
 var (
@@ -59,11 +60,12 @@ func IsBinary(path string) bool {
 	}
 	defer fp.Close()
 
-	isBin, err := binary.IsBinary(fp)
+	buf, err := ioutil.ReadAll(fp)
 	if err != nil {
 		return false
 	}
-	return isBin
+
+	return isbinary.Test(buf)
 }
 
 func FindTextFiles(paths []string) []string {
