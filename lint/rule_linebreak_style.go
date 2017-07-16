@@ -9,7 +9,9 @@ import (
 
 var metadataLinebreakRule = &MetaData{
 	Name: "linebreak",
-	rank: 0, // this rule should called before all rules
+
+	// this rule should called before all rules
+	rank: 0,
 }
 
 var (

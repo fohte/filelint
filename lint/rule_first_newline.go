@@ -7,7 +7,9 @@ import (
 
 var metadataFirstNewlineRule = &MetaData{
 	Name: "first-newline",
-	rank: 2, // this rule should called before final-newline rule
+
+	// this rule should called before final-newline rule
+	rank: 2,
 }
 
 type FirstNewlineRule struct {

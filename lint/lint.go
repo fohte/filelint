@@ -59,7 +59,10 @@ type Rule interface {
 type MetaData struct {
 	Name        string
 	Description string
-	rank        int // the order called by linter; this is evaluated in descending order
+
+	// rank is the order called by linter.
+	// this is evaluated in descending order.
+	rank int
 }
 
 type Result struct {
