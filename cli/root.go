@@ -86,7 +86,7 @@ func execute(cmd *cobra.Command, args []string) error {
 	}
 
 	if isShowVersion {
-		fmt.Printf("filelint v%s [%s %s-%s]\n", Version, runtime.Version(), runtime.GOOS, runtime.GOARCH)
+		showVersion()
 		return nil
 	}
 
@@ -99,38 +99,69 @@ func execute(cmd *cobra.Command, args []string) error {
 		cfg.File.Include = args
 	}
 
-	if isPrintTarget {
-		fs, err := cfg.File.FindTargets()
-		if err != nil {
-			return Raise(err)
-		}
-		for _, f := range fs {
-			fmt.Fprintln(out, f)
-		}
-		return nil
-	}
-
 	if isPrintConfig {
-		yml, err := yaml.Marshal(cfg)
-		if err != nil {
+		if err := printConfig(out, cfg); err != nil {
 			return Raise(err)
 		}
-		fmt.Fprintf(out, "%s", yml)
 		return nil
 	}
 
-	linterResult := struct {
+	if isPrintTarget {
+		if err := printTarget(out, cfg.File); err != nil {
+			return Raise(err)
+		}
+		return nil
+	}
+
+	var gitignorePath string
+	if useGitIgnore {
+		var err error
+		gitignorePath, err = lib.FindGitIgnore()
+		if err != nil && err != lib.ErrNotGitRepository {
+			return Raise(err)
+		}
+	}
+
+	if err := runLint(out, isAutofix, cfg, gitignorePath); err != nil {
+		return Raise(err)
+	}
+
+	return nil
+}
+
+func showVersion() {
+	fmt.Printf("filelint v%s [%s %s-%s]\n", Version, runtime.Version(), runtime.GOOS, runtime.GOARCH)
+}
+
+func printConfig(out io.Writer, cfg *config.Config) error {
+	yml, err := yaml.Marshal(cfg)
+	if err != nil {
+		return err
+	}
+	fmt.Fprintf(out, "%s", yml)
+	return nil
+}
+
+func printTarget(out io.Writer, f config.File) error {
+	fs, err := f.FindTargets()
+	if err != nil {
+		return err
+	}
+	for _, f := range fs {
+		fmt.Fprintln(out, f)
+	}
+	return nil
+}
+
+func runLint(out io.Writer, isAutofix bool, cfg *config.Config, gitignorePath string) error {
+	dp := dispatcher.NewDispatcher(cfg)
+
+	var (
 		numErrors      int
 		numFixedErrors int
 		numErrorFiles  int
 		numFixedFiles  int
-	}{}
-
-	dp := dispatcher.NewDispatcher(cfg)
-	gitignorePath, err := lib.FindGitIgnore()
-	if err != nil && err != lib.ErrNotGitRepository {
-		return err
-	}
+	)
 
 	if err := dp.Dispatch(gitignorePath, func(file string, rules []lint.Rule) error {
 		linter, err := lint.NewLinter(file, rules)
@@ -144,39 +175,38 @@ func execute(cmd *cobra.Command, args []string) error {
 		}
 
 		if num := len(result.Reports); num > 0 {
-			linterResult.numErrors += num
-			linterResult.numErrorFiles++
+			numErrors += num
+			numErrorFiles++
 
 			for _, report := range result.Reports {
 				if isAutofix {
 					fmt.Fprintf(out, "[autofixed]")
-					linterResult.numFixedErrors++
+					numFixedErrors++
 				}
-				if !isQuiet {
-					fmt.Fprintf(out, "%s:%s\n", file, report.String())
-				}
+				fmt.Fprintf(out, "%s:%s\n", file, report.String())
 			}
 
 			if isAutofix {
 				if err := writeFile(file, result.Fixed); err != nil {
 					return err
 				}
-				linterResult.numFixedFiles++
+				numFixedFiles++
 			}
 		}
 
 		return nil
 	}); err != nil {
-		return Raise(err)
+		return err
 	}
 
-	if !isAutofix && linterResult.numErrors > 0 {
-		fmt.Fprintf(out, "%d lint error(s) detected in %d file(s)\n", linterResult.numErrors, linterResult.numErrorFiles)
-		return Raise(errLintFailed)
+	if !isAutofix && numErrors > 0 {
+		fmt.Fprintf(out, "%d lint error(s) detected in %d file(s)\n", numErrors, numErrorFiles)
+		return errLintFailed
 	}
 
-	if linterResult.numFixedFiles > 0 {
-		fmt.Fprintf(out, "%d lint error(s) autofixed in %d file(s)\n", linterResult.numFixedErrors, linterResult.numFixedFiles)
+	if numFixedFiles > 0 {
+		fmt.Fprintf(out, "%d lint error(s) autofixed in %d file(s)\n", numFixedErrors, numFixedFiles)
+		return nil
 	}
 
 	return nil
