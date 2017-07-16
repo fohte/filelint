@@ -104,7 +104,7 @@ func NewReport(col, row int, message string) *Report {
 }
 
 func (rep *Report) String() string {
-	return fmt.Sprintf("%s:%s", rep.position.String(), rep.message)
+	return fmt.Sprintf("%s: %s", rep.position.String(), rep.message)
 }
 
 type Position struct {
