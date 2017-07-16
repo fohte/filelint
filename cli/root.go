@@ -31,6 +31,8 @@ var rootCmd = &cobra.Command{
 
 var (
 	configFile       string
+	enforceRules     ruleSliceValue
+	noEnforceRules   ruleSliceValue
 	isShowVersion    bool
 	isPrintConfig    bool
 	isPrintTarget    bool
@@ -42,6 +44,8 @@ var (
 
 func init() {
 	rootCmd.Flags().StringVarP(&configFile, "config", "c", "", "specify configuration file")
+	rootCmd.Flags().Var(&enforceRules, "enforce", "specify enforce rules")
+	rootCmd.Flags().Var(&noEnforceRules, "no-enforce", "specify no enforce rules")
 	rootCmd.Flags().BoolVarP(&isShowVersion, "version", "v", false, "print the version and quit")
 	rootCmd.Flags().BoolVar(&isPrintConfig, "print-config", false, "print the configuration")
 	rootCmd.Flags().BoolVar(&isPrintTarget, "print-targets", false, "print all lint target files and quit")
