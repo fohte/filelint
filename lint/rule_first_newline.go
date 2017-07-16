@@ -50,7 +50,7 @@ func (r *FirstNewlineRule) Lint(s []byte) (*Result, error) {
 	}
 
 	errmsg := fmt.Sprintf("Files should begin with %d newline(s) but %d newline(s)", r.Num, n)
-	res.AddReport(-1, -1, errmsg)
+	res.AddReport(0, 0, errmsg)
 
 	trimmed := bytes.TrimLeft(s, string(linebreak))
 

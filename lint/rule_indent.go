@@ -137,7 +137,7 @@ func (r *IndentRule) Lint(src []byte) (*Result, error) {
 			} else if bytes.HasPrefix(lines[i], []byte(" ")) {
 				errmsg = fmt.Sprintf(`%s but used %d space(s)`, expectMsg, softIndentWidth)
 			}
-			res.AddReport(col, -1, errmsg)
+			res.AddReport(col, 0, errmsg)
 		}
 
 		lines[i] = newLine

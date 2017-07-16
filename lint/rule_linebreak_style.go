@@ -89,7 +89,7 @@ func (r *LinebreakRule) Lint(s []byte) (*Result, error) {
 		r.Style,
 		formatTarget,
 	)
-	res.AddReport(-1, -1, errmsg)
+	res.AddReport(0, 0, errmsg)
 	res.Set(bytes.Replace(s, formatTarget, r.Style, -1))
 
 	return res, nil

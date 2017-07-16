@@ -21,7 +21,7 @@ func TestIndentRule_Lint(t *testing.T) {
 			want: []byte("  "),
 			rep: []*Report{
 				{
-					position: &Position{1, -1},
+					position: &Position{1, 0},
 					message:  `Expected indent with 2 space(s) but used hardtabs (\t)`,
 				},
 			},
@@ -32,7 +32,7 @@ func TestIndentRule_Lint(t *testing.T) {
 			want: []byte("    "),
 			rep: []*Report{
 				{
-					position: &Position{1, -1},
+					position: &Position{1, 0},
 					message:  `Expected indent with 4 space(s) but used hardtabs (\t)`,
 				},
 			},
@@ -43,7 +43,7 @@ func TestIndentRule_Lint(t *testing.T) {
 			want: []byte("    "),
 			rep: []*Report{
 				{
-					position: &Position{1, -1},
+					position: &Position{1, 0},
 					message:  `Expected indent with 2 space(s) but used hardtabs (\t)`,
 				},
 			},
@@ -60,11 +60,11 @@ func TestIndentRule_Lint(t *testing.T) {
 			want: []byte("  \n  "),
 			rep: []*Report{
 				{
-					position: &Position{1, -1},
+					position: &Position{1, 0},
 					message:  `Expected indent with 2 space(s) but used hardtabs (\t)`,
 				},
 				{
-					position: &Position{2, -1},
+					position: &Position{2, 0},
 					message:  `Expected indent with 2 space(s) but used hardtabs (\t)`,
 				},
 			},
@@ -75,11 +75,11 @@ func TestIndentRule_Lint(t *testing.T) {
 			want: []byte("  \r\n  "),
 			rep: []*Report{
 				{
-					position: &Position{1, -1},
+					position: &Position{1, 0},
 					message:  `Expected indent with 2 space(s) but used hardtabs (\t)`,
 				},
 				{
-					position: &Position{2, -1},
+					position: &Position{2, 0},
 					message:  `Expected indent with 2 space(s) but used hardtabs (\t)`,
 				},
 			},
@@ -90,7 +90,7 @@ func TestIndentRule_Lint(t *testing.T) {
 			want: []byte("\n  \n  "),
 			rep: []*Report{
 				{
-					position: &Position{2, -1},
+					position: &Position{2, 0},
 					message:  `Expected indent with 2 space(s) but used hardtabs (\t)`,
 				},
 			},
@@ -101,7 +101,7 @@ func TestIndentRule_Lint(t *testing.T) {
 			want: []byte(".\n    "),
 			rep: []*Report{
 				{
-					position: &Position{2, -1},
+					position: &Position{2, 0},
 					message:  `Expected indent with 4 space(s) but used 2 space(s)`,
 				},
 			},
@@ -114,7 +114,7 @@ func TestIndentRule_Lint(t *testing.T) {
 			want: []byte(".\n\t"),
 			rep: []*Report{
 				{
-					position: &Position{2, -1},
+					position: &Position{2, 0},
 					message:  `Expected indent with hardtabs (\t) but used 2 space(s)`,
 				},
 			},
@@ -125,7 +125,7 @@ func TestIndentRule_Lint(t *testing.T) {
 			want: []byte(".\n\t"),
 			rep: []*Report{
 				{
-					position: &Position{2, -1},
+					position: &Position{2, 0},
 					message:  `Expected indent with hardtabs (\t) but used 2 space(s)`,
 				},
 			},
@@ -136,11 +136,11 @@ func TestIndentRule_Lint(t *testing.T) {
 			want: []byte(".\n\t\n\t\t"),
 			rep: []*Report{
 				{
-					position: &Position{2, -1},
+					position: &Position{2, 0},
 					message:  `Expected indent with hardtabs (\t) but used 2 space(s)`,
 				},
 				{
-					position: &Position{3, -1},
+					position: &Position{3, 0},
 					message:  `Expected indent with hardtabs (\t) but used 2 space(s)`,
 				},
 			},
@@ -151,11 +151,11 @@ func TestIndentRule_Lint(t *testing.T) {
 			want: []byte(".\r\n\t\r\n\t\t"),
 			rep: []*Report{
 				{
-					position: &Position{2, -1},
+					position: &Position{2, 0},
 					message:  `Expected indent with hardtabs (\t) but used 2 space(s)`,
 				},
 				{
-					position: &Position{3, -1},
+					position: &Position{3, 0},
 					message:  `Expected indent with hardtabs (\t) but used 2 space(s)`,
 				},
 			},
@@ -166,7 +166,7 @@ func TestIndentRule_Lint(t *testing.T) {
 			want: []byte(".\n\t\n\t"),
 			rep: []*Report{
 				{
-					position: &Position{3, -1},
+					position: &Position{3, 0},
 					message:  `Expected indent with hardtabs (\t) but used 2 space(s)`,
 				},
 			},
@@ -185,15 +185,15 @@ func TestIndentRule_Lint(t *testing.T) {
 			want: []byte(".\n  /**\n   *\n   */"),
 			rep: []*Report{
 				{
-					position: &Position{2, -1},
+					position: &Position{2, 0},
 					message:  `Expected indent with 2 space(s) but used hardtabs (\t)`,
 				},
 				{
-					position: &Position{3, -1},
+					position: &Position{3, 0},
 					message:  `Expected indent with 2 space(s) but used hardtabs (\t)`,
 				},
 				{
-					position: &Position{4, -1},
+					position: &Position{4, 0},
 					message:  `Expected indent with 2 space(s) but used hardtabs (\t)`,
 				},
 			},
@@ -204,15 +204,15 @@ func TestIndentRule_Lint(t *testing.T) {
 			want: []byte(".\n    /**\n     *\n     */"),
 			rep: []*Report{
 				{
-					position: &Position{2, -1},
+					position: &Position{2, 0},
 					message:  `Expected indent with 4 space(s) but used 2 space(s)`,
 				},
 				{
-					position: &Position{3, -1},
+					position: &Position{3, 0},
 					message:  `Expected indent with 4 space(s) but used 2 space(s)`,
 				},
 				{
-					position: &Position{4, -1},
+					position: &Position{4, 0},
 					message:  `Expected indent with 4 space(s) but used 2 space(s)`,
 				},
 			},
@@ -271,15 +271,15 @@ func TestIndentRule_Lint(t *testing.T) {
 			}, "\n")),
 			rep: []*Report{
 				{
-					position: &Position{1, -1},
+					position: &Position{1, 0},
 					message:  `Expected indent with 2 space(s) but used hardtabs (\t)`,
 				},
 				{
-					position: &Position{2, -1},
+					position: &Position{2, 0},
 					message:  `Expected indent with 2 space(s) but used hardtabs (\t)`,
 				},
 				{
-					position: &Position{3, -1},
+					position: &Position{3, 0},
 					message:  `Expected indent with 2 space(s) but used hardtabs (\t)`,
 				},
 			},

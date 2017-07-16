@@ -48,7 +48,7 @@ func (r *FinalNewlineRule) Lint(s []byte) (*Result, error) {
 	}
 
 	errmsg := fmt.Sprintf("Files should end with %d newline(s) but %d newline(s)", r.Num, n)
-	res.AddReport(-1, -1, errmsg)
+	res.AddReport(0, 0, errmsg)
 
 	trimmed := bytes.TrimRight(s, string(linebreak))
 

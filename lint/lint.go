@@ -115,17 +115,8 @@ type Position struct {
 func (pos *Position) String() string {
 	var x, y string
 
-	if pos.row >= 0 {
-		x = strconv.Itoa(pos.row)
-	} else {
-		x = "-"
-	}
-
-	if pos.column >= 0 {
-		y = strconv.Itoa(pos.column)
-	} else {
-		y = "-"
-	}
+	x = strconv.Itoa(pos.row)
+	y = strconv.Itoa(pos.column)
 
 	return fmt.Sprintf("%s:%s", y, x)
 }

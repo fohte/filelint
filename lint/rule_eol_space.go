@@ -33,7 +33,7 @@ func (r *NoEOLSpaceRule) Lint(s []byte) (*Result, error) {
 	for i, l := range ls {
 		ls[i] = bytes.TrimRight(l, " \t")
 		if bytes.HasSuffix(l, []byte(" ")) || bytes.HasSuffix(l, []byte("\t")) {
-			res.AddReport(i+1, -1, errmsg)
+			res.AddReport(i+1, 0, errmsg)
 		}
 	}
 	res.Set(bytes.Join(ls, linebreak))
