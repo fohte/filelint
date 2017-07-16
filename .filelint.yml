@@ -1,6 +1,7 @@
 files:
   exclude:
     - '**/bindata.go'
+    - 'Gopkg.lock'
 targets:
   - patterns: ['**/*']
     rules:

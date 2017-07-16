@@ -1,0 +1,27 @@
+[[constraint]]
+  name = "github.com/fatih/set"
+  version = "0.1.0"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/mattn/go-zglob"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/mitchellh/go-homedir"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/mohae/deepcopy"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/sabhiram/go-gitignore"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/spf13/cobra"
+
+[[constraint]]
+  branch = "v2"
+  name = "gopkg.in/yaml.v2"
