@@ -35,9 +35,19 @@ func FindGitRootPath(path string) (string, error) {
 func FindGitIgnore() (string, error) {
 	gitRoot, err := FindGitRootPath(".")
 	if err != nil {
-		return "", err
+		if err == ErrNotGitRepository {
+			return "", nil
+		} else {
+			return "", err
+		}
 	}
-	return filepath.Join(gitRoot, ".gitignore"), nil
+
+	path := filepath.Join(gitRoot, ".gitignore")
+	if IsExist(path) {
+		return path, nil
+	} else {
+		return "", nil
+	}
 }
 
 func IsExist(path string) bool {

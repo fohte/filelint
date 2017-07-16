@@ -117,7 +117,7 @@ func execute(cmd *cobra.Command, args []string) error {
 	if useGitIgnore {
 		var err error
 		gitignorePath, err = lib.FindGitIgnore()
-		if err != nil && err != lib.ErrNotGitRepository {
+		if err != nil {
 			return Raise(err)
 		}
 	}
