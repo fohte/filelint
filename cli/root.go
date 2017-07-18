@@ -31,6 +31,7 @@ var rootCmd = &cobra.Command{
 
 var (
 	configFile       string
+	userRules        []string
 	isShowVersion    bool
 	isPrintConfig    bool
 	isPrintTarget    bool
@@ -42,6 +43,7 @@ var (
 
 func init() {
 	rootCmd.Flags().StringVarP(&configFile, "config", "c", "", "specify configuration file")
+	rootCmd.Flags().StringSliceVar(&userRules, "rule", []string{}, "specify rules")
 	rootCmd.Flags().BoolVarP(&isShowVersion, "version", "v", false, "print the version and quit")
 	rootCmd.Flags().BoolVar(&isPrintConfig, "print-config", false, "print the configuration")
 	rootCmd.Flags().BoolVar(&isPrintTarget, "print-targets", false, "print all lint target files and quit")
@@ -94,6 +96,17 @@ func execute(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return Raise(err)
 	}
+
+	userRuleMap := make(config.RuleMap)
+	for _, r := range userRules {
+		if err := yaml.Unmarshal([]byte(r), &userRuleMap); err != nil {
+			return err
+		}
+	}
+	cfg.Targets = append(cfg.Targets, config.Target{
+		Patterns: []string{"**/*"},
+		Rule:     userRuleMap,
+	})
 
 	if len(args) > 0 {
 		cfg.File.Include = args

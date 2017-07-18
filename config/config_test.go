@@ -128,6 +128,24 @@ func TestConfig_MatchedRule(t *testing.T) {
 			file: "path/to/a",
 			want: RuleMap{"a": {"A": 2}},
 		},
+		{
+			src: []Target{
+				{
+					Patterns: []string{"**/*"},
+					Rule:     RuleMap{"a": {"A": 1}},
+				},
+				{
+					Patterns: []string{"**/*.go"},
+					Rule:     RuleMap{"a": {"A": 2}},
+				},
+				{
+					Patterns: []string{"**/*"},
+					Rule:     RuleMap{"a": {"A": 3}},
+				},
+			},
+			file: "path/to/a.go",
+			want: RuleMap{"a": {"A": 3}},
+		},
 	}
 
 	for _, tt := range tests {
