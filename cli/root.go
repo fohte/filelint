@@ -97,16 +97,18 @@ func execute(cmd *cobra.Command, args []string) error {
 		return Raise(err)
 	}
 
-	userRuleMap := make(config.RuleMap)
-	for _, r := range userRules {
-		if err := yaml.Unmarshal([]byte(r), &userRuleMap); err != nil {
-			return err
+	if len(userRules) > 0 {
+		userRuleMap := make(config.RuleMap)
+		for _, r := range userRules {
+			if err := yaml.Unmarshal([]byte(r), &userRuleMap); err != nil {
+				return err
+			}
 		}
+		cfg.Targets = append(cfg.Targets, config.Target{
+			Patterns: []string{"**/*"},
+			Rule:     userRuleMap,
+		})
 	}
-	cfg.Targets = append(cfg.Targets, config.Target{
-		Patterns: []string{"**/*"},
-		Rule:     userRuleMap,
-	})
 
 	if len(args) > 0 {
 		cfg.File.Include = args
