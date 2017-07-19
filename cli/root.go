@@ -43,7 +43,7 @@ var (
 
 func init() {
 	rootCmd.Flags().StringVarP(&configFile, "config", "c", "", "specify configuration file")
-	rootCmd.Flags().StringSliceVar(&userRules, "rule", []string{}, "specify rules")
+	rootCmd.Flags().StringArrayVar(&userRules, "rule", []string{}, "specify rules")
 	rootCmd.Flags().BoolVarP(&isShowVersion, "version", "v", false, "print the version and quit")
 	rootCmd.Flags().BoolVar(&isPrintConfig, "print-config", false, "print the configuration")
 	rootCmd.Flags().BoolVar(&isPrintTarget, "print-targets", false, "print all lint target files and quit")
