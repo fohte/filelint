@@ -50,15 +50,16 @@ Usage:
   filelint [files...] [flags]
 
 Flags:
-  -c, --config string   specify configuration file
-      --fix             automatically fix problems
-  -h, --help            help for filelint
-      --no-config       don't use config file (use the application default config)
-      --print-config    print the configuration
-      --print-targets   print all lint target files and quit
-  -q, --quiet           don't print lint errors or fixed files
-      --use-gitignore   (experimental) read and use .gitignore file for excluding target files (default true)
-  -v, --version         print the version and quit
+  -c, --config string      specify configuration file
+      --fix                automatically fix problems
+  -h, --help               help for filelint
+      --no-config          don't use config file (use the application default config)
+      --print-config       print the configuration
+      --print-targets      print all lint target files and quit
+  -q, --quiet              don't print lint errors or fixed files
+      --rule stringArray   specify rules
+      --use-gitignore      (experimental) read and use .gitignore file for excluding target files (default true)
+  -v, --version            print the version and quit
 ```
 
 The `files` optional argument is linting target files.
