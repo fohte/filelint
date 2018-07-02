@@ -19,15 +19,6 @@ targets:
         enforce: true
       no-eol-space:
         enforce: true
-      indent:
-        enforce: true
-        style: soft
-        size: 2
-  - patterns: ['**/*.go']
-    rules:
-      indent:
-        enforce: true
-        style: hard
   - patterns: ['**/*.md']
     rules:
       no-eol-space:

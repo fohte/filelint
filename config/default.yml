@@ -8,10 +8,6 @@ files:
 targets:
   - patterns: ['**/*']
     rules:
-      indent:
-        enforce: false
-        size: 2
-        style: soft
       linebreak:
         enforce: true
         style: lf
