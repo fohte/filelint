@@ -154,28 +154,6 @@ This rule enforces no trailing whitespaces and tabs at the end of lines.
 
 This rule has no options.
 
-### `indent` (experimental)
-
-**This rule is experimental. We recommend to use other linter tools that can analyze syntax of codes.**
-
-This rule enforces a consistent indentation style to the any code and text.
-
-- default: no enforce
-
-##### `style`
-
-This option specify the indentation style.
-
-- default: `soft`
-- available values: `soft`/`space` or `hard`/`tab`
-
-##### `size`
-
-This option specify number of whitespaces for the `soft` indentation style.
-
-- default: `2`
-- available values: positive numbers
-
 ### `no-bom`
 
 This rule enforces no byte order marks (BOM) of UTF-8 to any text files.
